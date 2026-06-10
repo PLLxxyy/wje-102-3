@@ -4,9 +4,9 @@ import {
   calculateNutritionCore,
   emptyNutrition as sharedEmptyNutrition,
   round as sharedRound,
-} from '@shared/nutrition';
+} from '../../../shared/nutrition';
 
-export type { NutritionTotals } from '@shared/nutrition';
+export type { NutritionTotals } from '../../../shared/nutrition';
 
 export const emptyNutrition = sharedEmptyNutrition;
 

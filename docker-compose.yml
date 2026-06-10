@@ -21,7 +21,9 @@ services:
       retries: 20
 
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: ${COMPOSE_PROJECT_NAME:-wjerecipeworks}-backend
     restart: unless-stopped
     environment:
@@ -41,7 +43,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: .
+      dockerfile: frontend/Dockerfile
       args:
         VITE_API_BASE_URL: /api
         VITE_WS_URL: /

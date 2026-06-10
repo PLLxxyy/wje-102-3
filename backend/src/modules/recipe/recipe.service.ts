@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, In, Repository } from 'typeorm';
-import { calculateNutritionCore, NutritionTotals } from '@shared/nutrition';
+import { calculateNutritionCore, NutritionTotals } from '../../../../shared/nutrition';
 import { JwtUser } from '../../common/interfaces/jwt-user.interface';
 import { CollaborationRole, RecipeStatus, UserRole } from '../../types/enums';
 import { Collaboration } from '../collaboration/collaboration.entity';

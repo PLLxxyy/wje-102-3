@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "start": "node dist/main.js",
+    "start": "node dist/backend/src/main.js",
     "start:dev": "nest start --watch",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "seed": "node dist/utils/seed.js",
+    "seed": "node dist/backend/src/utils/seed.js",
     "seed:dev": "ts-node -r tsconfig-paths/register src/utils/seed.ts"
   },
   "dependencies": {
