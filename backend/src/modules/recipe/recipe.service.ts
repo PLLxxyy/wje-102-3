@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, In, Repository } from 'typeorm';
+import { calculateNutritionCore, NutritionTotals } from '@shared/nutrition';
 import { JwtUser } from '../../common/interfaces/jwt-user.interface';
 import { CollaborationRole, RecipeStatus, UserRole } from '../../types/enums';
 import { Collaboration } from '../collaboration/collaboration.entity';
@@ -24,13 +25,6 @@ export interface RecipeQuery {
   search?: string;
   authorId?: number;
   allStatuses?: boolean;
-}
-
-interface NutritionTotals {
-  total_calories: number;
-  total_protein: number;
-  total_fat: number;
-  total_carb: number;
 }
 
 @Injectable()
@@ -247,28 +241,9 @@ export class RecipeService {
     const ids = ingredientInputs.map((item) => item.ingredient_id);
     const ingredients = await this.ingredientRepository.findBy({ id: In(ids) });
     const ingredientMap = new Map(ingredients.map((ingredient) => [ingredient.id, ingredient]));
-    const totals = ingredientInputs.reduce<NutritionTotals>(
-      (sum, item) => {
-        const ingredient = ingredientMap.get(item.ingredient_id);
-        if (!ingredient) {
-          throw new NotFoundException(`食材 ${item.ingredient_id} 不存在`);
-        }
-        const ratio = item.amount / 100;
-        return {
-          total_calories: sum.total_calories + ingredient.calories_per_100g * ratio,
-          total_protein: sum.total_protein + ingredient.protein_per_100g * ratio,
-          total_fat: sum.total_fat + ingredient.fat_per_100g * ratio,
-          total_carb: sum.total_carb + ingredient.carb_per_100g * ratio,
-        };
-      },
-      { total_calories: 0, total_protein: 0, total_fat: 0, total_carb: 0 },
-    );
-    return {
-      total_calories: this.round(totals.total_calories),
-      total_protein: this.round(totals.total_protein),
-      total_fat: this.round(totals.total_fat),
-      total_carb: this.round(totals.total_carb),
-    };
+    return calculateNutritionCore(ingredientInputs, ingredientMap, (missingId) => {
+      throw new NotFoundException(`食材 ${missingId} 不存在`);
+    });
   }
 
   private async assertCanView(recipe: Recipe, user: JwtUser): Promise<void> {
@@ -323,9 +298,5 @@ export class RecipeService {
         snapshot,
       }),
     );
-  }
-
-  private round(value: number): number {
-    return Math.round(value * 100) / 100;
   }
 }
